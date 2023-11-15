@@ -97,10 +97,12 @@ const serverlessConfiguration: AWS = {
         Properties: {
           TableName: 'TaskComments',
           AttributeDefinitions: [
-            { AttributeName: 'taskId', AttributeType: 'S' },
+            { AttributeName: 'taskId', AttributeType: 'N' },
+            { AttributeName: 'timestamp', AttributeType: 'S' },
           ],
           KeySchema: [
             { AttributeName: 'taskId', KeyType: 'HASH' },
+            { AttributeName: 'timestamp', KeyType: 'RANGE' },
           ],
           ProvisionedThroughput: {
             ReadCapacityUnits: 5,

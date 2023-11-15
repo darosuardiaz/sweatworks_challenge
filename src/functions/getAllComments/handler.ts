@@ -5,6 +5,8 @@ import { sendResponse, errorHandler } from '@libs/middlewares';
 import schema from './schema';
 import { TaskComment } from './types';
 
+const DYNAMO_DB_TABLE = process.env.DYNAMO_DB_TABLE
+
 // Initialize the DynamoDB DocumentClient
 const dynamoDB = new DynamoDB.DocumentClient();
 
@@ -18,10 +20,10 @@ const getAllComments: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async 
 
     // Query DynamoDB for comments by task ID
     const queryParams: DynamoDB.DocumentClient.QueryInput = {
-      TableName: 'TaskComments', // Replace with your DynamoDB table name
+      TableName: 'TaskComments',
       KeyConditionExpression: 'taskId = :taskId',
       ExpressionAttributeValues: {
-        ':taskId': taskId,
+        ':taskId': +taskId,
       },
     };
 

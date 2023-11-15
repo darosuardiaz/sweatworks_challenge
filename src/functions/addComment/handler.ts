@@ -21,8 +21,10 @@ const addComment: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async (eve
     const commentItem: DynamoDB.DocumentClient.PutItemInput = {
       TableName: 'TaskComments',
       Item: {
-        taskId: taskId,
+        taskId: +taskId,
+        timestamp: (new Date()).toString(),
         comment: body.comment,
+
       },
     };
 
