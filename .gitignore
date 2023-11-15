@@ -1,0 +1,15 @@
+# package directories
+node_modules
+
+# Serverless directories
+.serverless
+
+# esbuild directories
+.esbuild
+
+# vscode
+.vscode
+
+# env
+.nvmrc
+.env

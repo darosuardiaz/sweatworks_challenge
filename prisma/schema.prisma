@@ -1,0 +1,20 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model tasks {
+  id             Int       @id(map: "pk_tasks") @default(autoincrement())
+  name           String    @db.VarChar(50)
+  completed      Boolean?  @default(false)
+  create_ts      DateTime  @default(now()) @db.Date
+  completed_ts   DateTime? @db.Date
+  last_update_ts DateTime? @db.Date
+}
