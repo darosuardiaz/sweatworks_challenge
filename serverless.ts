@@ -1,7 +1,7 @@
 import type { AWS } from '@serverless/typescript';
-
 import createTask from '@functions/createTask';
 import getAllTasks from '@functions/getAllTasks';
+import getTask from '@functions/getTask';
 import deleteTask from '@functions/deleteTask';
 import updateTask from '@functions/updateTask';
 import addComment from '@functions/addComment';
@@ -46,6 +46,7 @@ const serverlessConfiguration: AWS = {
   functions: {
     createTask,
     getAllTasks,
+    getTask,
     deleteTask,
     updateTask,
     addComment,
