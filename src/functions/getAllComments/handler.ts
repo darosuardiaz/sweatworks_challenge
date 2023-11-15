@@ -1,6 +1,7 @@
 import { DynamoDB } from 'aws-sdk';
-import { formatJSONResponse, type ValidatedEventAPIGatewayProxyEvent } from '@libs/api-gateway';
+import { type ValidatedEventAPIGatewayProxyEvent } from '@libs/api-gateway';
 import { middyfy } from '@libs/lambda';
+import { sendResponse, errorHandler } from '@libs/middlewares';
 import schema from './schema';
 
 interface Comment {
@@ -8,12 +9,13 @@ interface Comment {
   comment: string;
 }
 
+// Initialize the DynamoDB DocumentClient
+const dynamoDB = new DynamoDB.DocumentClient();
+
 const getAllComments: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async (event) => {
   try {
-    const taskId = +event.pathParameters!.id!
-
-    // Initialize the DynamoDB DocumentClient
-    const dynamoDB = new DynamoDB.DocumentClient();
+    const params = event.pathParameters!
+    const taskId = +params.id!
 
     // Query DynamoDB for comments by task ID
     const queryParams: DynamoDB.DocumentClient.QueryInput = {
@@ -29,18 +31,12 @@ const getAllComments: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async 
     // Parse the DynamoDB result into a list of Comment objects
     const comments: Comment[] = result.Items as Comment[];
 
-    return {
-      statusCode: 200,
-      body: JSON.stringify({ comments }),
-    };
-  } catch (error) {
+    return sendResponse(200, { comments })
+  } 
+  catch (error) {
     console.error('Error adding comment:', error);
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ error: error }),
-    };
+    return errorHandler(500, error!)
   }
-
 };
 
 export const main = middyfy(getAllComments);
