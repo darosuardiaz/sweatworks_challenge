@@ -10,16 +10,19 @@ const prisma = new PrismaClient()
 
 const getAllTasks: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async (event) => {
   try{
-    const params = event.pathParameters!
-    const taskId = +params.id!
+    // request input
+    const taskId = event.pathParameters!.id!
+
+    // validate input
+    if(!parseInt(taskId)) return errorHandler(400, "Invalid request params")
 
     // fetch task from db
-    const task = await prisma.tasks.findFirst({ where: { id: taskId } })
+    const task = await prisma.tasks.findFirst({ where: { id: +taskId } })
     return sendResponse(200, { task })
   } 
   catch(error){
     console.error(`Error getting task: `, error);
-    return errorHandler(500, error!)
+    return errorHandler(500, "Server Error")
   } 
 };
 

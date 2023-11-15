@@ -3,28 +3,30 @@ import { type ValidatedEventAPIGatewayProxyEvent } from '@libs/api-gateway';
 import { middyfy } from '@libs/lambda';
 import { sendResponse, errorHandler } from '@libs/middlewares';
 import schema from './schema';
-
-interface UpdateDto {
-  name?: string;
-  completed?: boolean;
-}
+import { UpdateTaskDto } from './types';
 
 // Instance prisma client for db access
 const prisma = new PrismaClient()
 
 const updateTask: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async (event) => {  
   try{
-    const taskId = +event.pathParameters!.id!
-    const body: UpdateDto = event.body
+    // request inputs
+    const taskId = event.pathParameters!.id!
+    const body: UpdateTaskDto = event.body;
 
+    // validate inputs
+    if(!parseInt(taskId)) return errorHandler(400, "Invalid request params")
+    if(!(body.completed || body.name)) return errorHandler(400, "Invalid request body")
+    
     let timestamps
     body.completed 
       ? timestamps = { completed_ts: new Date(), last_update_ts: new Date() }
       : timestamps = { last_update_ts: new Date() }
 
+    // update task on db
     const task = await prisma.tasks.update({ 
       where: 
-        { id: taskId }, 
+        { id: +taskId }, 
         data: {...body, ...timestamps}
     })
 
@@ -32,7 +34,7 @@ const updateTask: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async (eve
   }
   catch(error){
     console.error('Error getting all tasks:', error);
-    return errorHandler(500, error!)
+    return errorHandler(500, "Server Error")
   }
 };
 

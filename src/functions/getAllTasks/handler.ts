@@ -16,7 +16,7 @@ const getAllTasks: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async (ev
   } 
   catch(error){
     console.error('Error getting all tasks:', error);
-    return errorHandler(500, error!)
+    return errorHandler(500, "Server Error")
   } 
 };
 

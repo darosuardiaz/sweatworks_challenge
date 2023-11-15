@@ -1,7 +1,8 @@
 export default {
   type: "object",
   properties: {
-    name: { type: 'string' }
+    name: { type: 'string' },
+    completed: { type: 'boolean' }
   },
   required: ['name']
 } as const;

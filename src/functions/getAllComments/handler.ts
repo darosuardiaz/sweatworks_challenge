@@ -3,19 +3,18 @@ import { type ValidatedEventAPIGatewayProxyEvent } from '@libs/api-gateway';
 import { middyfy } from '@libs/lambda';
 import { sendResponse, errorHandler } from '@libs/middlewares';
 import schema from './schema';
-
-interface Comment {
-  taskId: string;
-  comment: string;
-}
+import { TaskComment } from './types';
 
 // Initialize the DynamoDB DocumentClient
 const dynamoDB = new DynamoDB.DocumentClient();
 
 const getAllComments: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async (event) => {
   try {
-    const params = event.pathParameters!
-    const taskId = +params.id!
+    // request input
+    const taskId = event.pathParameters!.id!
+
+    // validate input
+    if(!parseInt(taskId)) return errorHandler(400, "Invalid request params")
 
     // Query DynamoDB for comments by task ID
     const queryParams: DynamoDB.DocumentClient.QueryInput = {
@@ -29,13 +28,13 @@ const getAllComments: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async 
     const result = await dynamoDB.query(queryParams).promise();
 
     // Parse the DynamoDB result into a list of Comment objects
-    const comments: Comment[] = result.Items as Comment[];
+    const comments: TaskComment[] = result.Items as TaskComment[];
 
     return sendResponse(200, { comments })
   } 
   catch (error) {
-    console.error('Error adding comment:', error);
-    return errorHandler(500, error!)
+    console.error('Error gettin all comments:', error);
+    return errorHandler(500, "Server Error")
   }
 };
 
