@@ -23,7 +23,7 @@ const deleteTask: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async (eve
 
     // query dynamo for task comments
     const queryResult = await dynamoDB.query({
-      TableName: 'TaskComments', // Replace with your DynamoDB table name
+      TableName: 'TaskComments',
       KeyConditionExpression: 'taskId = :taskId',
       ExpressionAttributeValues: {
         ':taskId': +taskId,
@@ -34,7 +34,7 @@ const deleteTask: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async (eve
     if(queryResult.Items){
       queryResult.Items.map(async (commentItem) => {
         await dynamoDB.delete({
-          TableName: process.env.DYNAMO_DB_TABLE!,
+          TableName: 'TaskComments',
           Key: {
             taskId: commentItem.taskId,
             timestamp: commentItem.timestamp,
