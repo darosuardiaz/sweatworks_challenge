@@ -8,7 +8,7 @@ import schema from './schema';
 const prisma = new PrismaClient()
 
 
-const getAllTasks: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async (event) => {
+const getTask: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async (event) => {
   try{
     // request input
     const taskId = event.pathParameters!.id!
@@ -26,4 +26,4 @@ const getAllTasks: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async (ev
   } 
 };
 
-export const main = middyfy(getAllTasks);
+export const main = middyfy(getTask);

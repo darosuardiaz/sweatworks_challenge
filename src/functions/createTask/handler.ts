@@ -4,6 +4,7 @@ import { PrismaClient } from '@prisma/client'
 import schema from './schema';
 import { sendResponse, errorHandler } from '@libs/middlewares';
 import { CreateTaskDto } from './types';
+
 // Instance prisma client for db access
 const prisma = new PrismaClient()
 

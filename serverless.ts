@@ -11,7 +11,7 @@ import getAllComments from '@functions/getAllComments';
 const serverlessConfiguration: AWS = {
   service: 'tasks-api',
   frameworkVersion: '3',
-  plugins: ['serverless-esbuild'],
+  plugins: ['serverless-esbuild', 'serverless-offline'],
   provider: {
     name: 'aws',
     runtime: 'nodejs14.x',
@@ -23,6 +23,7 @@ const serverlessConfiguration: AWS = {
       AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',
       NODE_OPTIONS: '--enable-source-maps --stack-trace-limit=1000',
     },
+    // iam permission for dynamoDB
     iam: {
       role: {
         statements: [{
@@ -41,7 +42,7 @@ const serverlessConfiguration: AWS = {
       },
     },
   },
-  // import the function via paths
+  // import functions
   functions: {
     createTask,
     getAllTasks,
@@ -51,7 +52,6 @@ const serverlessConfiguration: AWS = {
     addComment,
     getAllComments,
   },
-
   package: { individually: true },
   custom: {
     esbuild: {
@@ -63,6 +63,42 @@ const serverlessConfiguration: AWS = {
       define: { 'require.resolve': undefined },
       platform: 'node',
       concurrency: 10,
+    },
+  },
+  resources: {
+    Resources: {
+      CommentsTable: {
+        Type: 'AWS::DynamoDB::Table',
+        Properties: {
+          TableName: 'TaskComments',
+          AttributeDefinitions: [
+            { AttributeName: 'taskId', AttributeType: 'N' },
+            { AttributeName: 'timestamp', AttributeType: 'S' },
+          ],
+          KeySchema: [
+            { AttributeName: 'taskId', KeyType: 'HASH' },
+            { AttributeName: 'timestamp', KeyType: 'RANGE' },
+          ],
+          ProvisionedThroughput: {
+            ReadCapacityUnits: 5,
+            WriteCapacityUnits: 5,
+          },
+        },
+      },
+      TasksDb: {
+        Type: 'AWS::RDS::DBInstance',
+        Properties: {
+          Engine: 'postgres',
+          DBInstanceIdentifier: 'tasks',
+          MasterUsername: 'pgadmin',
+          MasterUserPassword: 'pgadmin123',
+          AllocatedStorage: 20,
+          DBInstanceClass: 'db.t3.micro',
+          EngineVersion: '15.3',
+          MultiAZ: false,
+          PubliclyAccessible: true, // false for prod
+        },
+      },
     },
   },
 };
