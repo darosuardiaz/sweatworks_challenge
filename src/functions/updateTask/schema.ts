@@ -4,5 +4,4 @@ export default {
     name: { type: 'string' },
     completed: { type: 'boolean' }
   },
-  required: []
 } as const;
